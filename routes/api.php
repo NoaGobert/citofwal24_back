@@ -5,6 +5,7 @@ use App\Http\Controllers\FoodController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GroupsController;
 use App\Http\Controllers\UsersController;
 
 /*
@@ -21,6 +22,7 @@ use App\Http\Controllers\UsersController;
 Route::resource('/food', FoodController::class);
 Route::resource('/food-category', FoodCategoryController::class);
 Route::resource('/users', UsersController::class);
+Route::resource('/groups', GroupsController::class);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

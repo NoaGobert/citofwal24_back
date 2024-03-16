@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\User_address;
+use App\Models\User_phone;
+use App\Models\Food;
 
 class User extends Authenticatable
 {
@@ -45,4 +48,20 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+
+    public function address()
+    {
+        return $this->hasOne(User_address::class, 'users_uuid', 'uuid');
+    }
+
+    public function phone()
+    {
+        return $this->hasOne(User_phone::class, 'users_uuid', 'uuid');
+    }
+
+    public function food()
+    {
+        return $this->hasMany(Food::class, 'donator_id', 'uuid');
+    }
 }

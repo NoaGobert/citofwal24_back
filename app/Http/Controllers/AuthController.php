@@ -41,17 +41,12 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $client = new Client();
+        $userAddress = new UserAddress();
+        $response = $userAddress->getLatAndLon($request->street, $request->number, $request->zip, $request->city, $request->country);
 
-        $response = $client->request('GET', 'https://nominatim.openstreetmap.org/search', [
-            'query' => [
-                'q' => $request->street . ', ' . $request->number . ', ' . $request->zip . ', ' . $request->city . ', ' . $request->country,
-                'format' => 'json'
-            ]
-        ]);
 
-        $body = $response->getBody();
-        $json = json_decode($body, true);
+
+
 
         if (empty ($json)) {
             return response()->json([
@@ -59,8 +54,8 @@ class AuthController extends Controller
             ], 400);
         }
 
-        $latitude = $json[0]['lat'];
-        $longitude = $json[0]['lon'];
+        $latitude = $response[0]['lat'];
+        $longitude = $response[0]['lon'];
 
 
 

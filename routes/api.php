@@ -26,6 +26,7 @@ Route::resource('/groups', GroupsController::class);
 
 
 
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/validate-token', [AuthController::class, 'validateToken']);
@@ -40,4 +41,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // Route::resource('/users', UsersController::class);
 
 
+});
+    Route::resource('/food-category', FoodCategoryController::class);
+    Route::resource('/users', UsersController::class);
+    Route::resource('/groups', GroupsController::class);
 });

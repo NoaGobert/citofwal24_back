@@ -23,4 +23,14 @@ class food extends Model
         'expires_at',
         'group_uuid',
     ];
+
+    public function status()
+    {
+        return $this->hasOne(FoodStatus::class, 'foods_uuid', 'uuid');
+    }
+
+    public function category()
+    {
+        return $this->hasOne(FoodCategory::class, 'id', 'food_category_id');
+    }
 }

@@ -13,7 +13,7 @@ class FoodCategoryController extends Controller
      */
     public function index()
     {
-        $category = FoodCategory::where('is_active', '=', true)->get();
+        $category = FoodCategory::where('is_active', true)->get();
 
 
         if (!$category) {
@@ -51,7 +51,7 @@ class FoodCategoryController extends Controller
      */
     public function show(string $id)
     {
-        $category = FoodCategory::where('is_active', '=', true)->find($id);
+        $category = FoodCategory::where('is_active', true)->find($id);
 
         if (!$category) {
             return response()->json([
@@ -78,7 +78,7 @@ class FoodCategoryController extends Controller
             ], 400);
         }
 
-        $category = FoodCategory::where('is_active', '=', true)->find($id);
+        $category = FoodCategory::where('is_active', true)->find($id);
 
         if (!$category) {
             return response()->json([

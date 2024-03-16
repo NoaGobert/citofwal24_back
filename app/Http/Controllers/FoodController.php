@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\food;
 use App\Models\FoodCategory;
+use App\Models\FoodStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -16,9 +17,9 @@ class FoodController extends Controller
      */
     public function index()
     {
-        $foods = Food::where('is_active', '=', true)->get();
+        $foods = Food::where('is_active', true)->where('donator_id', '!=', auth()->user()->uuid)->get();
 
-        return $foods;
+        return response()->json($foods);
     }
 
     /**
@@ -26,6 +27,8 @@ class FoodController extends Controller
      */
     public function store(Request $request)
     {
+
+
         try {
             $validated = $request->validate([
                 'name' => 'required',
@@ -36,12 +39,15 @@ class FoodController extends Controller
                 'receiver_id' => 'nullable|exists:users,uuid',
                 'group_uuid' => 'required'
             ]);
+
+
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation error',
                 'errors' => $e->errors()
             ], 400);
         }
+
 
         // Check if food category exists and is active
         $category = FoodCategory::find($validated['food_category_id']);
@@ -51,11 +57,11 @@ class FoodController extends Controller
             ], 400);
         }
 
-        // if ($validated['receiver_id'] == $validated['donator_id']) {
-        //     return response()->json([
-        //         'message' => 'Donator and receiver cannot be the same'
-        //     ], 400);
-        // }
+        if ($validated['receiver_id'] == $validated['donator_id']) {
+            return response()->json([
+                'message' => 'Donator and receiver cannot be the same'
+            ], 400);
+        }
 
         $food = Food::create(
             [
@@ -71,7 +77,30 @@ class FoodController extends Controller
             ]
         );
 
-        return $food;
+        FoodStatus::create([
+            "status" => 'available',
+            "foods_uuid" => $food->uuid
+        ]);
+
+        if (!$request->hasFile('file')) {
+            return response()->json([
+                'message' => 'No file found in request',
+            ], 400);
+        }
+        if ($request->hasFile('files')) {
+            $files = $request->file('files');
+
+            foreach ($files as $file) {
+                $file->store('public/foods/' . $food->uuid . '_' . now()->timestamp);
+            }
+        } else {
+            $file = $request->file('file');
+            $file->store('public/foods/' . $food->uuid . '_' . now()->timestamp);
+        }
+        return response()->json([
+            'message' => 'Food created successfully',
+            'food' => $food
+        ]);
     }
 
     /**
@@ -79,9 +108,11 @@ class FoodController extends Controller
      */
     public function show(string $id)
     {
-        $food = Food::where('uuid', '=', $id)->first();
+        $food = Food::with('status', 'category')->where('uuid', '=', $id)->first();
 
-        return $food;
+        return response()->json([
+            'food' => $food
+        ]);
     }
 
     /**
@@ -97,8 +128,27 @@ class FoodController extends Controller
                 'food_category_id' => 'required',
                 'donator_id' => 'required',
                 'expires_at' => 'required',
-                'receiver_id' => 'nullable'
+                'receiver_id' => 'nullable',
+                'status' => 'required',
             ]);
+
+
+            $food = Food::where('uuid', '=', $id)->first();
+
+            if ($food) {
+                $food->fill($validated);
+                $food->save();
+
+                FoodStatus::where('foods_uuid', '=', $id)->update([
+                    'status' => $request->status
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'Food not found',
+                ], 404);
+            }
+
+
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation error',

@@ -19,10 +19,7 @@ use App\Http\Controllers\UsersController;
 |
 */
 
-Route::resource('/food', FoodController::class);
-Route::resource('/food-category', FoodCategoryController::class);
-Route::resource('/users', UsersController::class);
-Route::resource('/groups', GroupsController::class);
+
 
 
 
@@ -35,9 +32,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/authenticated-user', [AuthController::class, 'authenticatedUser']);
     Route::get('/profil', [AuthController::class, 'profil']);
-    // Route::resource('/food', FoodController::class);
-    // Route::resource('/food-category', FoodCategoryController::class);
-    // Route::resource('/users', UsersController::class);
-
-
+    Route::resource('/food', FoodController::class);
+    Route::resource('/food-category', FoodCategoryController::class);
+    Route::resource('/users', UsersController::class);
+    Route::resource('/groups', GroupsController::class);
 });

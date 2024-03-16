@@ -17,8 +17,7 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-Route::resource('/food', FoodController::class);
-Route::resource('/food-category', FoodCategoryController::class);
+
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -29,6 +28,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/authenticated-user', [AuthController::class, 'authenticatedUser']);
     Route::resource('/food', FoodController::class);
+    Route::resource('/food-category', FoodCategoryController::class);
 
 
 });

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\UserPhone;
 use App\Models\UserAddress;
+use GuzzleHttp\Client;
 
 class AuthController extends Controller
 {
@@ -36,10 +37,32 @@ class AuthController extends Controller
 
         ]);
 
-
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
+
+        $client = new Client();
+
+        $response = $client->request('GET', 'https://nominatim.openstreetmap.org/search', [
+            'query' => [
+                'q' => $request->street . ', ' . $request->number . ', ' . $request->zip . ', ' . $request->city . ', ' . $request->country,
+                'format' => 'json'
+            ]
+        ]);
+
+        $body = $response->getBody();
+        $json = json_decode($body, true);
+
+        if (empty ($json)) {
+            return response()->json([
+                'message' => 'Address not found',
+            ], 400);
+        }
+
+        $latitude = $json[0]['lat'];
+        $longitude = $json[0]['lon'];
+
+
 
         $uuid = (string) Str::uuid();
 
@@ -67,8 +90,8 @@ class AuthController extends Controller
                 'zip' => $request->zip,
                 'city' => $request->city,
                 'country' => $request->country,
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
                 'region' => $request->region,
             ]);
 

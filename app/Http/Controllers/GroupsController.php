@@ -13,7 +13,7 @@ class GroupsController extends Controller
         $groups = Group::where('is_active', true)->get();
 
         return response()->json([
-            'groups' => $groups
+            $groups
         ], 200);
     }
 
@@ -23,7 +23,7 @@ class GroupsController extends Controller
             $validated = $request->validate([
                 'name' => 'required',
                 'description' => 'required',
-                'group_owner' => 'required,exists:users,id'
+                'group_owner' => 'required|exists:users,uuid'
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
@@ -32,12 +32,12 @@ class GroupsController extends Controller
             ], 422);
         }
 
-        $group = new Group();
-        $group->uuid = Str::uuid();
-        $group->name = $request->name;
-        $group->description = $request->description;
-        $group->group_owner = $request->group_owner;
-        $group->save();
+        $group = group::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'group_owner' => $request->group_owner,
+            'uuid' => Str::uuid()
+        ]);
 
         return response()->json([
             'message' => 'Group created successfully',
@@ -60,7 +60,7 @@ class GroupsController extends Controller
         ], 200);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
         try {
             $validated = $request->validate([
@@ -75,7 +75,7 @@ class GroupsController extends Controller
             ], 422);
         }
 
-        $group = Group::where('id', $request->id)->where('is_active', true)->first();
+        $group = Group::where('id', $id)->where('is_active', true)->first();
 
         if (!$group) {
             return response()->json([
@@ -83,10 +83,11 @@ class GroupsController extends Controller
             ], 404);
         }
 
-        $group->name = $request->name;
-        $group->description = $request->description;
-        $group->group_owner = $request->group_owner;
-        $group->save();
+        Group::where('id', $id)->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'group_owner' => $request->group_owner
+        ]);
 
         return response()->json([
             'message' => 'Group updated successfully',

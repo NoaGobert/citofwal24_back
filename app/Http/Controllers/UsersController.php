@@ -44,12 +44,13 @@ class UsersController extends Controller
         }
 
         $user = User::where('uuid', $uuid)->first();
-        $this->authorize('verify', $user);
         if (!$user) {
             return response()->json([
                 "message" => "User not found"
             ], 404);
         }
+        $this->authorize('verify', $user);
+
 
         if ($user->phone != $request->phone) {
             UserPhone::create([
@@ -60,6 +61,7 @@ class UsersController extends Controller
 
         $user->firstname = $request->firstname;
         $user->lastname = $request->lastname;
+        $user->email = $request->email;
 
         $user->save();
 
@@ -77,6 +79,7 @@ class UsersController extends Controller
                 "message" => "User not found"
             ], 404);
         }
+        $this->authorize('verify', $user);
         $user->is_active = 0;
         $user->save();
 

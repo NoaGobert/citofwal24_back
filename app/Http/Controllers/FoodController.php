@@ -84,6 +84,13 @@ class FoodController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $food = Food::where('uuid', '=', $id)->first();
+
+        $food->is_active = false;
+        $food->save();
+
+        return response()->json([
+            'message' => 'Food deleted successfully'
+        ], 200);
     }
 }

@@ -30,12 +30,18 @@ class UsersController extends Controller
 
     public function update(Request $request, $uuid)
     {
-
-        $validator = $request->validate([
-            "firstname" => "required",
-            "lastname" => "required",
-            "phone" => "required",
-        ]);
+        try {
+            $validator = $request->validate([
+                "firstname" => "required",
+                "lastname" => "required",
+                "phone" => "required",
+                "email" => "required|email|unique:users",
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                "message" => $e->errors()
+            ], 400);
+        }
 
         $user = User::where('uuid', $uuid)->first();
         $this->authorize('verify', $user);

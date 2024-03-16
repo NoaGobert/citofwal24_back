@@ -15,4 +15,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::resource('/food', FoodController::class);
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::resource('/food', FoodController::class);
+
+
+});

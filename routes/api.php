@@ -26,6 +26,8 @@ Route::get('/validate-token', [AuthController::class, 'validateToken']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/user', [AuthController::class, 'user']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/authenticated-user', [AuthController::class, 'authenticatedUser']);
     Route::resource('/food', FoodController::class);
 
 

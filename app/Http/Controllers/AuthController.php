@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\UserPhone;
 use App\Models\UserAddress;
@@ -42,32 +43,43 @@ class AuthController extends Controller
 
         $uuid = (string) Str::uuid();
 
-        User::insertGetId([
-            'uuid' => $uuid,
-            'firstname' => $request->firstname,
-            'lastname' => $request->lastname,
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        try {
+            DB::beginTransaction();
 
-        UserPhone::create([
-            'users_uuid' => $uuid,
-            'phone' => $request->phone,
+            User::insertGetId([
+                'uuid' => $uuid,
+                'firstname' => $request->firstname,
+                'lastname' => $request->lastname,
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        ]);
+            UserPhone::create([
+                'users_uuid' => $uuid,
+                'phone' => $request->phone,
+            ]);
 
-        UserAddress::create([
-            'users_uuid' => $uuid,
-            'street' => $request->street,
-            'number' => $request->number,
-            'zip' => $request->zip,
-            'city' => $request->city,
-            'country' => $request->country,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'region' => $request->region,
-        ]);
+            UserAddress::create([
+                'users_uuid' => $uuid,
+                'street' => $request->street,
+                'number' => $request->number,
+                'zip' => $request->zip,
+                'city' => $request->city,
+                'country' => $request->country,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'region' => $request->region,
+            ]);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return response()->json([
+                'message' => 'Error while creating user' . $e->getMessage(),
+            ], 500);
+        }
 
 
         return response()->json([
@@ -79,17 +91,22 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-
         if (!Auth::attempt($credentials)) {
             return response()->json([
                 'message' => 'Unauthorized'
             ], 401);
         }
+        $user = Auth::user();
 
-        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found'
+            ], 404);
+        }
 
 
         $user->tokens()->delete();
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -97,10 +114,27 @@ class AuthController extends Controller
             'token_type' => 'Bearer',
         ]);
     }
+
+    public function logout()
+    {
+        auth()->user()->tokens()->delete();
+
+        return response()->json([
+            "message" => "logged out"
+        ]);
+    }
+
     public function validateToken()
     {
         return response()->json([
             "message" => auth('sanctum')->check()
+        ]);
+    }
+
+    public function authenticatedUser()
+    {
+        return response()->json([
+            "user" => auth()->user()
         ]);
     }
 }

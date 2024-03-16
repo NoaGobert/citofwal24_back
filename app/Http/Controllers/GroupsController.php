@@ -68,6 +68,7 @@ class GroupsController extends Controller
                 'description' => 'required',
                 'group_owner' => 'required,exists:users,id'
             ]);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'message' => 'The given data was invalid.',

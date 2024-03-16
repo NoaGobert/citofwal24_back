@@ -13,7 +13,7 @@ class UsersController extends Controller
     public function index()
     {
         $users = User::where('is_active', 1)->with('addresses')->get();
-        return $users;
+        return response()->json($users);
     }
 
     public function show($id)
@@ -24,45 +24,21 @@ class UsersController extends Controller
                 "message" => "User not found"
             ], 404);
         }
-        return $user;
+        return response()->json($user);
     }
 
-    public function store(Request $request)
-    {
-        // $validator = $request->validate([
-        //     "firstname" => "required",
-        //     "lastname" => "required",
-        //     "phone" => "required",
-        //     "email" => "required|email|unique:users",
-        //     "password" => "required",
-        //     "confirm_password" => "required|same:password",
-        // ]);
-
-        // $user = new User;
-        // $user->uuid = Str::uuid();
-        // $user->firstname = $request->firstname;
-        // $user->lastname = $request->lastname;
-        // $user->email = $request->email;
-        // $user->password = bcrypt($request->password);
-        // $user->save();
-
-        // return response()->json([
-        //     "message" => "User created successfully",
-        //     "user" => $user
-        // ], 201);
-    }
 
     public function update(Request $request, $uuid)
     {
+
         $validator = $request->validate([
             "firstname" => "required",
             "lastname" => "required",
             "phone" => "required",
-            "email" => "required|email|unique:users",
         ]);
 
-        $user = User::find($uuid);
-
+        $user = User::where('uuid', $uuid)->first();
+        $this->authorize('verify', $user);
         if (!$user) {
             return response()->json([
                 "message" => "User not found"
@@ -78,7 +54,7 @@ class UsersController extends Controller
 
         $user->firstname = $request->firstname;
         $user->lastname = $request->lastname;
-        $user->email = $request->email;
+
         $user->save();
 
         return response()->json([

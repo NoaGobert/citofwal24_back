@@ -82,20 +82,29 @@ class FoodController extends Controller
             "foods_uuid" => $food->uuid
         ]);
 
+
         if (!$request->hasFile('file')) {
             return response()->json([
                 'message' => 'No file found in request',
             ], 400);
         }
+
         if ($request->hasFile('files')) {
             $files = $request->file('files');
 
-            foreach ($files as $file) {
-                $file->store('public/foods/' . $food->uuid . '_' . now()->timestamp);
+            if (count($files) > 2) {
+                return response()->json([
+                    'message' => 'You can only upload a maximum of 2 files',
+                ], 400);
             }
+
+            foreach ($files as $key => $file) {
+                $file->store('public/foods/' . $food->uuid . '_' . $key . '_' . now()->timestamp);
+            }
+
         } else {
             $file = $request->file('file');
-            $file->store('public/foods/' . $food->uuid . '_' . now()->timestamp);
+            $file->store('public/foods/' . $food->uuid . '_1_' . now()->timestamp);
         }
         return response()->json([
             'message' => 'Food created successfully',

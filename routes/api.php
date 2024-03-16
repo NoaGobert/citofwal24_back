@@ -5,6 +5,7 @@ use App\Http\Controllers\FoodController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UsersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,14 +20,13 @@ use App\Http\Controllers\AuthController;
 
 Route::resource('/food', FoodController::class);
 Route::resource('/food-category', FoodCategoryController::class);
+Route::resource('/users', UsersController::class);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('/user', [AuthController::class, 'user']);
+    Route::get('/profil', [AuthController::class, 'profil']);
     Route::resource('/food', FoodController::class);
-
-
 });

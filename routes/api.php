@@ -24,6 +24,8 @@ Route::resource('/food-category', FoodCategoryController::class);
 Route::resource('/users', UsersController::class);
 Route::resource('/groups', GroupsController::class);
 
+
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/validate-token', [AuthController::class, 'validateToken']);
@@ -34,4 +36,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/authenticated-user', [AuthController::class, 'authenticatedUser']);
     Route::get('/profil', [AuthController::class, 'profil']);
     // Route::resource('/food', FoodController::class);
+    // Route::resource('/food-category', FoodCategoryController::class);
+    // Route::resource('/users', UsersController::class);
+
+
 });

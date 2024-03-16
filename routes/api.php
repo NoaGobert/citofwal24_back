@@ -24,9 +24,12 @@ Route::resource('/users', UsersController::class);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-
+Route::get('/validate-token', [AuthController::class, 'validateToken']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::get('/user', [AuthController::class, 'user']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/authenticated-user', [AuthController::class, 'authenticatedUser']);
     Route::get('/profil', [AuthController::class, 'profil']);
     Route::resource('/food', FoodController::class);
 });

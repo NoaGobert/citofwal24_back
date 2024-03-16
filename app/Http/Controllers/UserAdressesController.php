@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 
 class UserAdressesController extends Controller
 {
-    public function show($id)
+    public function show()
     {
-        $user = User::where('is_active', 1)->find($id);
+        $id = auth()->user()->uuid;
+        $user = User::where('is_active', 1)->where('uuid', $id)->with('addresses')->first();
         return $user;
     }
 

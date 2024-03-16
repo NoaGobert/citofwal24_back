@@ -42,7 +42,3 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
 
 });
-    Route::resource('/food-category', FoodCategoryController::class);
-    Route::resource('/users', UsersController::class);
-    Route::resource('/groups', GroupsController::class);
-});

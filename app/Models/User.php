@@ -52,12 +52,12 @@ class User extends Authenticatable
 
     public function address()
     {
-        return $this->hasOne(User_address::class, 'users_uuid', 'uuid');
+        return $this->hasOne(UserAddress::class, 'users_uuid', 'uuid');
     }
 
     public function phone()
     {
-        return $this->hasOne(User_phone::class, 'users_uuid', 'uuid');
+        return $this->hasOne(UserPhone::class, 'users_uuid', 'uuid');
     }
 
     public function food()

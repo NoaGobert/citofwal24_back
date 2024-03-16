@@ -19,10 +19,9 @@ use App\Http\Controllers\UsersController;
 |
 */
 
-// Route::resource('/food', FoodController::class);
-Route::resource('/food-category', FoodCategoryController::class);
-Route::resource('/users', UsersController::class);
-Route::resource('/groups', GroupsController::class);
+
+
+
 
 
 
@@ -32,13 +31,21 @@ Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/validate-token', [AuthController::class, 'validateToken']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
+
+    // AUTH
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/authenticated-user', [AuthController::class, 'authenticatedUser']);
     Route::get('/profil', [AuthController::class, 'profil']);
-    Route::resource('/food', FoodController::class);
-    // Route::resource('/food-category', FoodCategoryController::class);
-    // Route::resource('/users', UsersController::class);
 
+    // FOODS
+    Route::resource('/food', FoodController::class);
+    Route::resource('/food-category', FoodCategoryController::class);
+
+    // USERS
+    Route::resource('/users', UsersController::class);
+
+    //GROUPS
+    Route::resource('/groups', GroupsController::class);
 
 });

@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+
+use App\Models\User;
+use App\Models\UserPhone;
+use App\Models\UserAddress;
 
 class AuthController extends Controller
 {
@@ -22,6 +25,7 @@ class AuthController extends Controller
             'status' => 'required',
             'password' => 'required',
         ]);
+
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);

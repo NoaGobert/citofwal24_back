@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserPhone;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -69,7 +70,8 @@ class UsersController extends Controller
         }
 
         if ($user->phone != $request->phone) {
-            $user->phone->create([
+            UserPhone::create([
+                "users_uuid" => $uuid,
                 "phone" => $request->phone
             ]);
         }

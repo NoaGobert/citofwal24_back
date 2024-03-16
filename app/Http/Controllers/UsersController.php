@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserPhone;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -51,18 +52,16 @@ class UsersController extends Controller
         // ], 201);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $uuid)
     {
         $validator = $request->validate([
             "firstname" => "required",
             "lastname" => "required",
             "phone" => "required",
             "email" => "required|email|unique:users",
-            "password" => "required",
-            "confirm_password" => "required|same:password",
         ]);
 
-        $user = User::find($request->id);
+        $user = User::find($uuid);
 
         if (!$user) {
             return response()->json([
@@ -70,10 +69,16 @@ class UsersController extends Controller
             ], 404);
         }
 
+        if ($user->phone != $request->phone) {
+            UserPhone::create([
+                "users_uuid" => $uuid,
+                "phone" => $request->phone
+            ]);
+        }
+
         $user->firstname = $request->firstname;
         $user->lastname = $request->lastname;
         $user->email = $request->email;
-        $user->password = bcrypt($request->password);
         $user->save();
 
         return response()->json([
@@ -84,7 +89,12 @@ class UsersController extends Controller
 
     public function destroy($id)
     {
-        $user = User::find($id);
+        $user = User::where('uuid', $id)->first();
+        if (!$user) {
+            return response()->json([
+                "message" => "User not found"
+            ], 404);
+        }
         $user->is_active = 0;
         $user->save();
 

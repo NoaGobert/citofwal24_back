@@ -30,7 +30,7 @@ class AuthController extends Controller
             'number' => 'required',
             'zip' => 'required',
             'city' => 'required',
-            'country' => 'required',
+            // 'country' => 'required',
             'latitude' => 'required',
             'longitude' => 'required',
             'region' => 'required',
@@ -81,7 +81,7 @@ class AuthController extends Controller
                 'number' => $request->number,
                 'zip' => $request->zip,
                 'city' => $request->city,
-                'country' => $request->country,
+                'country' => "Belgium", // $request->country
                 'latitude' => $latitude,
                 'longitude' => $longitude,
                 'region' => $request->region,

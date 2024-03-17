@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
+use App\Models\UsersGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -33,10 +34,16 @@ class GroupsController extends Controller
         }
 
         $group = group::create([
+            'uuid' => Str::uuid(),
             'name' => $request->name,
             'description' => $request->description,
             'group_owner' => $request->group_owner,
-            'uuid' => Str::uuid()
+
+        ]);
+
+        UsersGroup::create([
+            'user_uuid' => $request->group_owner,
+            'group_uuid' => $group->uuid
         ]);
 
         return response()->json([

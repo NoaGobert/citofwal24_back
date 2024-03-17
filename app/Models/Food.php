@@ -20,6 +20,9 @@ class food extends Model
         'donator_id',
         'receiver_id',
         'is_active',
+        'lat',
+        'confirmation_code',
+        'lon',
         'expires_at',
         'group_uuid',
     ];

@@ -9,6 +9,8 @@ use Database\Factories\UserFactory;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
+use App\Models\User;
+use Illuminate\Support\Facades\Validator;
 
 class FoodController extends Controller
 {
@@ -30,15 +32,15 @@ class FoodController extends Controller
 
 
         try {
-            $validated = $request->validate([
+            $validated = Validator::make($request->all(), [
                 'name' => 'required',
                 'description' => 'required',
                 'diet' => 'required',
                 'food_category_id' => 'required|exists:foods_categories,id',
                 'donator_id' => 'required|exists:users,uuid',
                 'receiver_id' => 'nullable|exists:users,uuid',
-                'group_uuid' => 'required'
-            ]);
+            ])->validate();
+
 
 
         } catch (ValidationException $e) {
@@ -57,11 +59,12 @@ class FoodController extends Controller
             ], 400);
         }
 
-        if ($validated['receiver_id'] == $validated['donator_id']) {
+        if (isset ($validated['receiver_id']) && $validated['receiver_id'] == $validated['donator_id']) {
             return response()->json([
                 'message' => 'Donator and receiver cannot be the same'
             ], 400);
         }
+
 
         $food = Food::create(
             [
@@ -71,9 +74,13 @@ class FoodController extends Controller
                 "diet" => $validated['diet'],
                 "food_category_id" => $validated['food_category_id'],
                 "donator_id" => $validated['donator_id'],
-                "receiver_id" => $validated['receiver_id'],
+                "receiver_id" => $validated['receiver_id'] ?? null,
+                "lat" => $request->lat ?? null,
+                "lon" => $request->lon ?? null,
+                "location_description" => $request->location_description ?? null,
+                "confirmation_code" => random_int(100000000, 999999999),
                 "expires_at" => now()->addDays(1),
-                "group_uuid" => $validated['group_uuid'],
+                "group_uuid" => User::with('groups')->where('uuid', '=', $validated['donator_id'])->first()->groups->pluck('group_uuid')->first()
             ]
         );
 
@@ -86,6 +93,7 @@ class FoodController extends Controller
         if (!$request->hasFile('file')) {
             return response()->json([
                 'message' => 'No file found in request',
+                'food' => $food
             ], 400);
         }
 
@@ -117,7 +125,7 @@ class FoodController extends Controller
      */
     public function show(string $id)
     {
-        $food = Food::with('status', 'category')->where('uuid', '=', $id)->first();
+        $food = Food::with('status', 'category')->where('uuid', '=', $id)->where('donator_id', '!=', auth()->user()->uuid)->first();
 
         return response()->json([
             'food' => $food
@@ -143,7 +151,7 @@ class FoodController extends Controller
 
 
             $food = Food::where('uuid', '=', $id)->first();
-
+            $this->authorize('verify', $food);
             if ($food) {
                 $food->fill($validated);
                 $food->save();
@@ -164,6 +172,28 @@ class FoodController extends Controller
                 'errors' => $e->errors()
             ], 400);
         }
+    }
+    public function acceptFood(Request $request, string $id)
+    {
+        $food = Food::where('uuid', '=', $id)->first();
+        $this->authorize('verify', $food);
+
+        if ($food->receiver_id) {
+            return response()->json([
+                'message' => 'Food already has a receiver'
+            ], 400);
+        }
+
+        $food->receiver_id = auth()->user()->uuid;
+        $food->save();
+
+        FoodStatus::where('foods_uuid', '=', $id)->update([
+            'status' => 'accepted'
+        ]);
+
+        return response()->json([
+            'message' => 'Food accepted successfully'
+        ], 200);
     }
 
     /**

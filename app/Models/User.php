@@ -69,4 +69,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Food::class, 'donator_id', 'uuid');
     }
+    // public function groupOwner()
+    // {
+
+    //     return $this->belongsToMany(Group::class, 'group_owner', 'uuid');
+    // }
+    public function groups()
+    {
+        //i have to join users_groups table on thr users table users.uuid = users_groups.user_uuid
+
+        return $this->hasMany(UsersGroup::class, 'user_uuid', 'uuid');
+    }
 }

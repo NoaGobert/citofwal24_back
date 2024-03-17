@@ -41,6 +41,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // FOODS
     Route::resource('/food', FoodController::class);
     Route::resource('/food-category', FoodCategoryController::class);
+    Route::post('/food/accept/{id}', [FoodController::class, 'acceptFood']);
 
     // USERS
     Route::resource('/users', UsersController::class);

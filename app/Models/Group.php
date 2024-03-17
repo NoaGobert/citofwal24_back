@@ -9,7 +9,12 @@ class Group extends Model
 {
     use HasFactory;
 
+    protected $table = 'groups';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
+        'uuid',
         'name',
         'description',
         'group_owner',

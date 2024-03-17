@@ -9,8 +9,9 @@ class FoodStatus extends Model
 {
     use HasFactory;
 
-
+    protected $table = 'foods_status';
     protected $fillable = [
+        'foods_uuid',
         'status',
     ];
 

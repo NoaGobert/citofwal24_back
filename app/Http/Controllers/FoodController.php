@@ -39,7 +39,6 @@ class FoodController extends Controller
                 'description' => 'required',
                 'diet' => 'required',
                 'food_category_id' => 'required|exists:foods_categories,id',
-                'donator_id' => 'required|exists:users,uuid',
                 'receiver_id' => 'nullable|exists:users,uuid',
             ])->validate();
         } catch (ValidationException $e) {
@@ -77,7 +76,7 @@ class FoodController extends Controller
                 "description" => $validated['description'],
                 "diet" => $validated['diet'],
                 "food_category_id" => $validated['food_category_id'],
-                "donator_id" => $validated['donator_id'],
+                "donator_id" => Auth()->user()->uuid,
                 "receiver_id" => $validated['receiver_id'] ?? null,
                 "lat" => $request->lat ?? null,
                 "lon" => $request->lon ?? null,
@@ -146,7 +145,6 @@ class FoodController extends Controller
                 'description' => 'required',
                 'diet' => 'required',
                 'food_category_id' => 'required',
-                'donator_id' => 'required',
                 'expires_at' => 'required',
                 'receiver_id' => 'nullable',
                 'status' => 'required',
@@ -156,7 +154,14 @@ class FoodController extends Controller
             $food = Food::where('uuid', '=', $id)->first();
             $this->authorize('verify', $food);
             if ($food) {
-                $food->fill($validated);
+                $food->fill(
+                    array_merge(
+                        $validated,
+                        [
+                            'donator_id' => auth()->user()->uuid,
+                        ]
+                    )
+                );
                 $food->save();
 
                 FoodStatus::where('foods_uuid', '=', $id)->update([

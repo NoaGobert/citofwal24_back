@@ -45,9 +45,6 @@ class AuthController extends Controller
         $response = $userAddress->getLatAndLon($request->street, $request->number, $request->zip, $request->city, $request->country);
 
 
-
-
-
         if (empty ($json)) {
             return response()->json([
                 'message' => 'Address not found',

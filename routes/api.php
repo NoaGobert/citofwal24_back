@@ -27,7 +27,7 @@ use App\Http\Controllers\UsersController;
 
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::get('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/validate-token', [AuthController::class, 'validateToken']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {

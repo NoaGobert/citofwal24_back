@@ -34,7 +34,7 @@ class AuthController extends Controller
             'country' => 'required',
             'latitude' => 'nullable',
             'longitude' => 'nullable',
-            'region' => 'required',
+            'region' => 'nullable',
 
         ]);
 

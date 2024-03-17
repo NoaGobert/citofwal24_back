@@ -26,7 +26,7 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'birthdate' => 'required|date',
             'password' => 'required',
-            'phone' => 'required',
+            // 'phone' => 'required',
             'street' => 'required',
             'number' => 'required',
             'zip' => 'required',
@@ -72,10 +72,10 @@ class AuthController extends Controller
                 'birthdate' => $request->birthdate,
             ]);
 
-            UserPhone::create([
-                'users_uuid' => $uuid,
-                'phone' => $request->phone,
-            ]);
+            // UserPhone::create([
+            //     'users_uuid' => $uuid,
+            //     'phone' => $request->phone,
+            // ]);
 
             UserAddress::create([
                 'users_uuid' => $uuid,

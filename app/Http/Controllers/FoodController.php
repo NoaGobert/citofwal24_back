@@ -40,9 +40,6 @@ class FoodController extends Controller
                 'donator_id' => 'required|exists:users,uuid',
                 'receiver_id' => 'nullable|exists:users,uuid',
             ])->validate();
-
-
-
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation error',
@@ -59,12 +56,17 @@ class FoodController extends Controller
             ], 400);
         }
 
-        if (isset ($validated['receiver_id']) && $validated['receiver_id'] == $validated['donator_id']) {
+        if (isset($validated['receiver_id']) && $validated['receiver_id'] == $validated['donator_id']) {
             return response()->json([
                 'message' => 'Donator and receiver cannot be the same'
             ], 400);
         }
 
+        if (User::where('uuid', '=', Auth()->user()->uuid)->groups->isEmpty()) {
+            return response()->json([
+                'message' => 'You must be part of a group to donate food'
+            ], 400);
+        }
 
         $food = Food::create(
             [
@@ -109,7 +111,6 @@ class FoodController extends Controller
             foreach ($files as $key => $file) {
                 $file->store('public/foods/' . $food->uuid . '_' . $key . '_' . now()->timestamp);
             }
-
         } else {
             $file = $request->file('file');
             $file->store('public/foods/' . $food->uuid . '_1_' . now()->timestamp);
@@ -164,8 +165,6 @@ class FoodController extends Controller
                     'message' => 'Food not found',
                 ], 404);
             }
-
-
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation error',

@@ -17,8 +17,10 @@ class FoodController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+
+
         $foods = Food::where('is_active', true)->where('donator_id', '!=', auth()->user()->uuid)->get();
 
         return response()->json($foods);

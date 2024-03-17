@@ -22,7 +22,7 @@ class FoodCategoryController extends Controller
             ], 404);
         }
 
-        return $category;
+        return response()->json($category);
     }
 
     /**
@@ -43,7 +43,7 @@ class FoodCategoryController extends Controller
 
         $category = FoodCategory::create($validated);
 
-        return $category;
+        return response()->json($category);
     }
 
     /**
@@ -59,7 +59,7 @@ class FoodCategoryController extends Controller
             ], 404);
         }
 
-        return $category;
+        return response()->json($category);
     }
 
     /**
@@ -88,7 +88,7 @@ class FoodCategoryController extends Controller
 
         $category->update($validated);
 
-        return $category;
+        return response()->json($category);
     }
 
     /**
@@ -107,6 +107,6 @@ class FoodCategoryController extends Controller
         $category->is_active = false;
         $category->save();
 
-        return $category;
+        return response()->json($category);
     }
 }

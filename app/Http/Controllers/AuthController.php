@@ -24,15 +24,16 @@ class AuthController extends Controller
             'lastname' => 'required|string|max:255',
             'username' => 'required',
             'email' => 'required|email|unique:users,email',
+            'birthdate' => 'required|date',
             'password' => 'required',
             'phone' => 'required',
             'street' => 'required',
             'number' => 'required',
             'zip' => 'required',
             'city' => 'required',
-            // 'country' => 'required',
-            'latitude' => 'required',
-            'longitude' => 'required',
+            'country' => 'required',
+            'latitude' => 'nullable',
+            'longitude' => 'nullable',
             'region' => 'required',
 
         ]);
@@ -45,10 +46,10 @@ class AuthController extends Controller
         $response = $userAddress->getLatAndLon($request->street, $request->number, $request->zip, $request->city, $request->country);
 
 
-        if (empty ($json)) {
+        if (empty ($response)) {
             return response()->json([
-                'message' => 'Address not found',
-            ], 400);
+                'message' => 'Address not found'
+            ], 404);
         }
 
         $latitude = $response[0]['lat'];
@@ -68,6 +69,7 @@ class AuthController extends Controller
                 'username' => $request->username,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
+                'birthdate' => $request->birthdate,
             ]);
 
             UserPhone::create([
@@ -81,7 +83,7 @@ class AuthController extends Controller
                 'number' => $request->number,
                 'zip' => $request->zip,
                 'city' => $request->city,
-                'country' => "Belgium", // $request->country
+                'country' => $request->country,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
                 'region' => $request->region,

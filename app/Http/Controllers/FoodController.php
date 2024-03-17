@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\food;
 use App\Models\FoodCategory;
 use App\Models\FoodStatus;
+use App\Models\Group;
 use Database\Factories\UserFactory;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -63,11 +64,18 @@ class FoodController extends Controller
             ], 400);
         }
 
-        if (User::where('uuid', '=', Auth()->user()->uuid)->groups->isEmpty()) {
+        $user = User::where('uuid', '=', Auth()->user()->uuid)->first();
+
+        $user_group = $user->groups->first();
+
+
+        if (!$user_group) {
             return response()->json([
                 'message' => 'You must be part of a group to donate food'
             ], 400);
         }
+
+        $user_group = Group::where('uuid', '=', $user_group->uuid)->first();
 
         $food = Food::create(
             [
@@ -83,7 +91,7 @@ class FoodController extends Controller
                 "location_description" => $request->location_description ?? null,
                 "confirmation_code" => random_int(100000000, 999999999),
                 "expires_at" => now()->addDays(1),
-                "group_uuid" => User::with('groups')->where('uuid', '=', $validated['donator_id'])->first()->groups->pluck('group_uuid')->first()
+                "group_uuid" => $user_group->uuid,
             ]
         );
 
